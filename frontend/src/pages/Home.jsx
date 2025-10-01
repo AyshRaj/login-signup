@@ -35,8 +35,3 @@ const Home = ({ user, error }) => {
           </div>
         )}
       </div>
-    </div>
-  );
-};
-
-export default Home;
