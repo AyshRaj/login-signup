@@ -2,12 +2,8 @@ import React, { useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 
-const Register = ({ setUser }) => {
-  const [formData, setFormData] = useState({
-    username:"",
-    email: "",
-    password: "",
-  });
+const Register = () => {
+  const [formData, setFormData] = useState({ username: "", email: "", password: "" });
   const [error, setError] = useState("");
   const navigate = useNavigate();
 
@@ -16,36 +12,31 @@ const Register = ({ setUser }) => {
   };
 
   const handleSubmit = async (e) => {
-  e.preventDefault();
-  try {
-    const res = await axios.post("/api/users/register", formData);
-    console.log("✅ Registration success:", res.data);
+    e.preventDefault();
+    try {
+      const res = await axios.post("/api/users/register", formData);
 
-    localStorage.setItem("token", res.data.token);
-    setUser(res.data);
-    navigate("/");
-  } catch (err) {
-    console.error("❌ Registration failed:", err);
-    setError(err.response?.data?.message || "Registration failed");
-  }
-};
-
+      // ✅ success flow
+      setError("");
+      alert(res.data.message); // "Please check your email..."
+      navigate("/login");      // send user to login page
+    } catch (err) {
+      console.error("❌ Registration failed:", err);
+      setError(err.response?.data?.message || "Registration failed");
+    }
+  };
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-100">
       <div className="bg-white p-8 rounded-lg shadow-lg w-full max-w-md border border-gray-200">
-        <h2 className="text-2xl font-bold mb-6 text-center text-gray-800">
-          Register
-        </h2>
+        <h2 className="text-2xl font-bold mb-6 text-center text-gray-800">Register</h2>
         {error && <p className="text-red-500 mb-4 text-sm">{error}</p>}
         <form onSubmit={handleSubmit}>
           <div className="mb-4">
-            <label className="block text-gray-600 text-sm font-medium mb-1">
-              Username
-            </label>
+            <label className="block text-gray-600 text-sm font-medium mb-1">Username</label>
             <input
               className="w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-200 outline-none focus:border-blue-400"
-              type="username"
+              type="text"
               name="username"
               value={formData.username}
               onChange={handleChange}
@@ -55,9 +46,7 @@ const Register = ({ setUser }) => {
             />
           </div>
           <div className="mb-4">
-            <label className="block text-gray-600 text-sm font-medium mb-1">
-              Email
-            </label>
+            <label className="block text-gray-600 text-sm font-medium mb-1">Email</label>
             <input
               className="w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-200 outline-none focus:border-blue-400"
               type="email"
@@ -70,9 +59,7 @@ const Register = ({ setUser }) => {
             />
           </div>
           <div className="mb-6">
-            <label className="block text-gray-600 text-sm font-medium mb-1">
-              Password
-            </label>
+            <label className="block text-gray-600 text-sm font-medium mb-1">Password</label>
             <input
               className="w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-200 outline-none focus:border-blue-400"
               type="password"
