@@ -21,8 +21,7 @@ const Navbar = ({ user, setUser }) => {
           {user ? (
             <button
               onClick={handleLogout}
-              className="text-white bg-red-500 px-4 py-2 rounded hover:bg-red-600"
-            >
+              className="text-white bg-red-500 px-4 py-2 rounded hover:bg-red-600">
               Logout
             </button>
           ) : (

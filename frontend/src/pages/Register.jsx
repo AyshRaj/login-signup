@@ -16,12 +16,12 @@ const Register = () => {
     try {
       const res = await axios.post("/api/users/register", formData);
 
-      // ✅ success flow
+   
       setError("");
-      alert(res.data.message); // "Please check your email..."
-      navigate("/login");      // send user to login page
+      alert(res.data.message); 
+      navigate("/login");   
     } catch (err) {
-      console.error("❌ Registration failed:", err);
+      console.error(" Registration failed:", err);
       setError(err.response?.data?.message || "Registration failed");
     }
   };

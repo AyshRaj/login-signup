@@ -17,12 +17,12 @@ const Login = ({ setUser }) => {
     e.preventDefault();
     try {
       const res = await axios.post("/api/users/login", formData);
-      console.log("✅ Login success:", res.data);
+      console.log(" Login success:", res.data);
       localStorage.setItem("token", res.data.token);
       setUser(res.data);
       navigate("/");
     } catch (err) {
-      console.error("❌ Login failed:", err);
+      console.error(" Login failed:", err);
       setError(err.response?.data?.message || "Login failed");
     }
   };
@@ -57,7 +57,7 @@ const Login = ({ setUser }) => {
               placeholder="Enter your password"
               required
             />
-             <Link to="/forgot-password" className="text-blue-600  hover:bg-blue-600 font-medium p-2">Forget Password ?</Link>
+             <Link to="/forgot-password" className="text-blue-600  font-medium p-2">Forget Password ?</Link>
 
           </div>
           <button className="w-full bg-blue-500 text-white p-3 rounded-md hover:bg-blue-600 font-medium cursor-pointer">Login</button>

@@ -1,5 +1,7 @@
 import express from "express";
 import User from "../models/User.js";
+import  CategoryModel from "../models/category.js";
+import SubCategoryModel from "../models/subcategory.js";
 import Token from "../models/Token.js";
 import crypto from "crypto";
 import sendEmail from "../utils/sendEmail.js";
@@ -58,7 +60,8 @@ router.get("/verify/:id/:token", async (req, res) => {
     });
 
     if (!token && user.verified) {
-      return res.status(200).json({ message: "Email verified successfully" });
+      console.log(`✅ User already verified: ${user.email}`);
+      return res.status(200).json({ message: "Email already verified" });
     }
 
     if (!token) {
@@ -66,8 +69,11 @@ router.get("/verify/:id/:token", async (req, res) => {
     }
 
     user.verified = true;
+    console.log(` Verifying user: ${user.email}`); // <-- Added this line
     await user.save();
     await token.deleteOne();
+
+    console.log(` User verified successfully: ${user.email}`); // <-- Added this line
 
     return res.status(200).json({ message: "Email verified successfully" });
   } catch (err) {
@@ -171,6 +177,164 @@ router.post("/reset-password/:id/:token", async (req, res) => {
   } catch (err) {
     console.error(err);
     res.status(500).json({ message: "Internal Server Error" });
+  }
+});
+
+
+
+// Create 
+router.post("/post", async (req, res) => {
+  try {
+    const data = new CategoryModel({
+      cat_id: req.body.cat_id,
+      cat_name: req.body.cat_name
+    });
+
+    const saved = await data.save();
+    res.json({ message: " Category saved successfully", saved });
+  } catch (err) {
+    res.status(500).json({ message: " Error saving category", error: err });
+  }
+});
+
+// Fetch 
+router.get("/fetchall", async (req, res) => {
+  try {
+    const all = await CategoryModel.find();
+    res.json(all);
+  } catch (err) {
+    res.status(500).json({ message: " Error fetching categories" });
+  }
+});
+
+// Fetch Single Category
+router.get("/fetch/:cat_id", async (req, res) => {
+  try {
+    const record = await CategoryModel.findOne({ cat_id: req.params.cat_id });
+    if (!record) return res.status(404).json({ message: "Category not found" });
+    res.json(record);
+  } catch (err) {
+    res.status(500).json({ message: " Fetch error" });
+  }
+});
+
+// Update 
+router.put("/update/:cat_id", async (req, res) => {
+  try {
+    const updated = await CategoryModel.findOneAndUpdate(
+      { cat_id: req.params.cat_id },
+      { $set: { cat_name: req.body.cat_name } },
+      { new: true }
+    );
+    if (!updated) return res.status(404).json({ message: "Category not found" });
+    res.json({ message: " Category updated", updated });
+  } catch (err) {
+    res.status(500).json({ message: " Update error" });
+  }
+});
+
+// Delete 
+router.delete("/del/:cat_id", async (req, res) => {
+  try {
+    const deleted = await CategoryModel.findOneAndDelete({ cat_id: req.params.cat_id });
+    if (!deleted) return res.status(404).json({ message: "Category not found" });
+    res.json({ message: " Category deleted", deleted });
+  } catch (err) {
+    res.status(500).json({ message: " Delete error" });
+  }
+});
+
+router.post("/sub-post", async (req, res) => {
+  try {
+    const data = new SubCategoryModel({
+      sub_id: req.body.sub_id,
+      sub_name: req.body.sub_name,
+      cat_id: req.body.cat_id 
+    });
+
+    const saved = await data.save();
+    res.json({ message: " Subcategory saved successfully", saved });
+  } catch (err) {
+    res.status(500).json({ message: " Error saving subcategory", error: err });
+  }
+});
+
+router.get("/sub-fetchall", async (req, res) => {
+  try {
+    const all = await SubCategoryModel.find();
+    res.json(all);
+  } catch (err) {
+    res.status(500).json({ message: " Error fetching subcategories" });
+  }
+});
+
+// Fetch Single Subcategory
+router.get("/sub-fetch/:sub_id", async (req, res) => {
+  try {
+    const record = await SubCategoryModel.findOne({ sub_id: req.params.sub_id });
+    if (!record) return res.status(404).json({ message: "Subcategory not found" });
+    res.json(record);
+  } catch (err) {
+    res.status(500).json({ message: " Fetch error" });
+  }
+});
+
+// Update Subcategory
+router.put("/sub-update/:sub_id", async (req, res) => {
+  try {
+    const updated = await SubCategoryModel.findOneAndUpdate(
+      { sub_id: req.params.sub_id },
+      { $set: { sub_name: req.body.sub_name, cat_id: req.body.cat_id } },
+      { new: true }
+    );
+    if (!updated) return res.status(404).json({ message: "Subcategory not found" });
+    res.json({ message: " Subcategory updated", updated });
+  } catch (err) {
+    res.status(500).json({ message: " Update error" });
+  }
+});
+
+// Delete Subcategory
+router.delete("/sub-del/:sub_id", async (req, res) => {
+  try {
+    const deleted = await SubCategoryModel.findOneAndDelete({ sub_id: req.params.sub_id });
+    if (!deleted) return res.status(404).json({ message: "Subcategory not found" });
+    res.json({ message: " Subcategory deleted", deleted });
+  } catch (err) {
+    res.status(500).json({ message: " Delete error" });
+  }
+});
+
+// join 
+router.get("/join/:cat_id", async (req, res) => {
+  try {
+    const catId = parseInt(req.params.cat_id);
+
+    const data = await SubCategoryModel.aggregate([
+      { $match: { cat_id: catId } },
+      {
+        $lookup: {
+          from: "cat_cols",
+          localField: "cat_id",
+          foreignField: "cat_id",
+          as: "cat"
+        }
+      },
+      { $unwind: "$cat" },
+      {
+        $project: {
+          _id: 0,
+          cat_id: 1,
+          cat_name: "$cat.cat_name",
+          sub_id: 1,
+          sub_name: 1
+        }
+      }
+    ]);
+
+    res.json(data);
+  } catch (err) {
+    res.status(500).json({ message: "Join error", error: err });
   }
 });
 

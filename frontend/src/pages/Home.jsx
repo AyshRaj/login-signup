@@ -21,14 +21,12 @@ const Home = ({ user, error }) => {
             <div className="flex flex-col space-y-4">
               <Link
                 to="/login"
-                className="w-full bg-blue-500 text-white p-3 rounded-md hover:bg-blue-600 font-medium text-center"
-              >
+                className="w-full bg-blue-500 text-white p-3 rounded-md hover:bg-blue-600 font-medium text-center" >
                 Login
               </Link>
               <Link
                 to="/register"
-                className="w-full bg-gray-200 text-gray-800 p-3 rounded-md hover:bg-gray-300 font-medium text-center"
-              >
+                className="w-full bg-gray-200 text-gray-800 p-3 rounded-md hover:bg-gray-300 font-medium text-center" >
                 Register
               </Link>
             </div>
